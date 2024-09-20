@@ -1,0 +1,6 @@
+",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://ehlgfonodkljjbpedhnphehcflbohngk/"
+  ]
+}

@@ -35,6 +35,7 @@ in
       pkgs.xdg-utils
       xdgPdfItem
       xdgOpenPdf
+      pkgs.open-trusted-extension
     ]
     ++ lib.optional config.ghaf.development.debug.tools.enable pkgs.alsa-utils;
   # TODO create a repository of mac addresses to avoid conflicts
@@ -73,11 +74,15 @@ in
         name = lib.mkForce "chromium-vm";
         applications = lib.mkForce ''
           {
-            "chromium": "${config.ghaf.givc.appPrefix}/run-waypipe ${config.ghaf.givc.appPrefix}/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland ${config.ghaf.givc.idsExtraArgs}"
+            "chromium": "${config.ghaf.givc.appPrefix}/run-waypipe ${config.ghaf.givc.appPrefix}/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland ${config.ghaf.givc.idsExtraArgs} --load-extension=${pkgs.open-trusted-extension.outPath}"
           }'';
       };
 
       ghaf.reference.programs.chromium.enable = true;
+
+      environment.etc."chromium/native-messaging-hosts/fi.ssrc.open_trusted.json" = {
+        source = "${pkgs.open-trusted-extension}/fi.ssrc.open_trusted.json";
+      };
 
       # Set default PDF XDG handler
       xdg.mime.defaultApplications."application/pdf" = "ghaf-pdf.desktop";
