@@ -39,6 +39,7 @@ in
       pkgs.globalprotect-openconnect
       pkgs.openconnect
       pkgs.nftables
+      pkgs.open-normal-extension
     ];
   # TODO create a repository of mac addresses to avoid conflicts
   macAddress = "02:00:00:03:10:01";
@@ -78,7 +79,7 @@ in
         name = lib.mkForce "business-vm";
         applications = lib.mkForce ''
           {
-            "chromium":     "${config.ghaf.givc.appPrefix}/run-waypipe ${config.ghaf.givc.appPrefix}/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland ${config.ghaf.givc.idsExtraArgs}",
+            "chromium":     "${config.ghaf.givc.appPrefix}/run-waypipe ${config.ghaf.givc.appPrefix}/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland ${config.ghaf.givc.idsExtraArgs} --load-extension=${pkgs.open-normal-extension.outPath}",
             "outlook":      "${config.ghaf.givc.appPrefix}/run-waypipe ${config.ghaf.givc.appPrefix}/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland --app=https://outlook.office.com/mail/ ${config.ghaf.givc.idsExtraArgs}",
             "office":       "${config.ghaf.givc.appPrefix}/run-waypipe ${config.ghaf.givc.appPrefix}/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland --app=https://microsoft365.com ${config.ghaf.givc.idsExtraArgs}",
             "teams":        "${config.ghaf.givc.appPrefix}/run-waypipe ${config.ghaf.givc.appPrefix}/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland --app=https://teams.microsoft.com ${config.ghaf.givc.idsExtraArgs}",
@@ -87,6 +88,10 @@ in
       };
 
       ghaf.reference.programs.chromium.enable = true;
+
+      environment.etc."chromium/native-messaging-hosts/fi.ssrc.open_normal.json" = {
+        source = "${pkgs.open-normal-extension}/fi.ssrc.open_normal.json";
+      };
 
       # Set default PDF XDG handler
       xdg.mime.defaultApplications."application/pdf" = "ghaf-pdf.desktop";
