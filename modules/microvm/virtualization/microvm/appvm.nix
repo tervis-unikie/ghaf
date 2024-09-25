@@ -72,6 +72,7 @@ let
                   withDebug = configHost.ghaf.profiles.debug.enable;
                   withHardenedConfigs = true;
                 };
+
                 # Logging client configuration
                 logging.client.enable = configHost.ghaf.logging.client.enable;
                 logging.client.endpoint = configHost.ghaf.logging.client.endpoint;
@@ -95,6 +96,7 @@ let
                 runWaypipe
                 pkgs.tpm2-tools
                 pkgs.opensc
+                pkgs.givc-cli
               ];
 
               security.tpm2 = {

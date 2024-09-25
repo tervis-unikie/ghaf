@@ -39,6 +39,7 @@ in
       pkgs.globalprotect-openconnect
       pkgs.openconnect
       pkgs.nftables
+      pkgs.open-normal-extension
     ];
   # TODO create a repository of mac addresses to avoid conflicts
   macAddress = "02:00:00:03:10:01";
@@ -82,7 +83,7 @@ in
         applications = [
           {
             name = "chromium";
-            command = "${config.ghaf.givc.appPrefix}/run-waypipe ${config.ghaf.givc.appPrefix}/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland ${config.ghaf.givc.idsExtraArgs}";
+            command = "${config.ghaf.givc.appPrefix}/run-waypipe ${config.ghaf.givc.appPrefix}/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland ${config.ghaf.givc.idsExtraArgs} --load-extension=${pkgs.open-normal-extension}";
             args = [ "url" ];
           }
           {
@@ -109,6 +110,27 @@ in
         enable = true;
         name = "${name}";
         users.${config.ghaf.users.accounts.user}.directories = [ ".config" ];
+      };
+
+      environment.etc."chromium/native-messaging-hosts/fi.ssrc.open_normal.json" = {
+        source = "${pkgs.open-normal-extension}/fi.ssrc.open_normal.json";
+      };
+      environment.etc."open-normal-extension.cfg" = {
+        text = let
+          cliArgs = builtins.replaceStrings [ "\n" ] [ " " ] ''
+            --name ${config.ghaf.givc.adminConfig.name}
+            --addr ${config.ghaf.givc.adminConfig.addr}
+            --port ${config.ghaf.givc.adminConfig.port}
+            ${lib.optionalString config.ghaf.givc.enableTls "--cacert /run/givc/ca-cert.pem"}
+            ${lib.optionalString config.ghaf.givc.enableTls "--cert /run/givc/gui-vm-cert.pem"}
+            ${lib.optionalString config.ghaf.givc.enableTls "--key /run/givc/gui-vm-key.pem"}
+            ${lib.optionalString (!config.ghaf.givc.enableTls) "--notls"}
+          '';
+        in
+          ''
+            GIVC_PATH="/run/current-system/sw"
+            GIVC_OPTS="${cliArgs}"
+          '';
       };
 
       # Set default PDF XDG handler
